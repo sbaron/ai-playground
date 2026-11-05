@@ -3,5 +3,10 @@
     "slug": "html-games",
     "title": "HTML Games",
     "description": "Single-file browser games, each created in one shot by Qwen3.8 27B (Q6_K_M)."
+  },
+  {
+    "slug": "solar-system",
+    "title": "Solar System Explorer",
+    "description": "Interactive 3D orrery in Three.js, built by strata-qwen3.8-flash-next-iq4 running locally."
   }
 ]
