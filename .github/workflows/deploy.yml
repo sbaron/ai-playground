@@ -1,0 +1,43 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "www/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-www
+  cancel-in-progress: false
+
+env:
+  DEPLOY_HOST: nbg1.overcloud.one
+  DEPLOY_PORT: "2222"
+  DEPLOY_USER: deploy
+  # The deploy key is locked to rrsync rooted at /var/www/ai-playground on the
+  # server, so "/" here is that directory.
+  DEPLOY_PATH: /
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Sync www/ to server
+        run: |
+          rsync -rlvzc --delete --chmod=D755,F644 \
+            -e "ssh -p $DEPLOY_PORT -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
