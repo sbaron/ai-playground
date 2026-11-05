@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "slug": "html-games",
+    "title": "HTML Games",
+    "description": "Single-file browser games, each created in one shot by Qwen3.8 27B (Q6_K_M)."
+  }
+]
